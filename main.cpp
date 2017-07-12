@@ -56,7 +56,7 @@ main (int argc, char *argv[])
     curl_multi_add_handle (multi_handle, curl);
 
   int still_running;
-  curl_multi_perform (multi_handle, &still_running);
+//  curl_multi_perform (multi_handle, &still_running);
 
   do
     {
@@ -130,6 +130,7 @@ main (int argc, char *argv[])
   int i = 1;
   for (auto curl:easy_curls)
     {
+      curl_multi_remove_handle (multi_handle, curl);
       double filesize = 0.;
       int res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD,
                                 &filesize);
@@ -138,6 +139,8 @@ main (int argc, char *argv[])
         curl_easy_cleanup (curl);
         i++;
     }
+
+  curl_multi_cleanup (multi_handle);
 
 
   for (auto fp:fpointers)

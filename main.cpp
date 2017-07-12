@@ -5,8 +5,7 @@
 #include <unistd.h>
 #include <vector>
 
-size_t
-write_data (void *ptr, size_t size, size_t nmemb, FILE * stream)
+size_t write_data (void *ptr, size_t size, size_t nmemb, FILE * stream)
 {
   size_t written = fwrite (ptr, size, nmemb, stream);
   return written;
@@ -42,10 +41,11 @@ main (int argc, char *argv[])
           curl_easy_setopt (curl, CURLOPT_URL, url);
           curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, write_data);
           curl_easy_setopt (curl, CURLOPT_WRITEDATA, fpointers.back ());
-          //          res = curl_easy_perform(curl);
+          //                    res = curl_easy_perform(curl);
         }
     }
-
+  //  return 0;
+  //}
   CURLM *multi_handle;
 
   /* init a multi stack */
@@ -56,7 +56,7 @@ main (int argc, char *argv[])
     curl_multi_add_handle (multi_handle, curl);
 
   int still_running;
-//  curl_multi_perform (multi_handle, &still_running);
+  //  curl_multi_perform (multi_handle, &still_running);
 
   do
     {
@@ -90,7 +90,8 @@ main (int argc, char *argv[])
         }
 
       /* get file descriptors from the transfers */
-      mc = curl_multi_fdset (multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+      mc =
+          curl_multi_fdset (multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
       if (mc != CURLM_OK)
         {
@@ -132,12 +133,13 @@ main (int argc, char *argv[])
     {
       curl_multi_remove_handle (multi_handle, curl);
       double filesize = 0.;
-      int res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD,
-                                &filesize);
-        if((CURLE_OK == res) && (filesize>0.0))
-          std::cout<<argv[i]<<" Downloaded! Final size:"<<filesize<<"bytes\n";
-        curl_easy_cleanup (curl);
-        i++;
+      int res = curl_easy_getinfo (curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+                                   &filesize);
+      if ((CURLE_OK == res) && (filesize > 0.0))
+        std::cout << argv[i] << " Downloaded! Final size:" << filesize <<
+                     " bytes\n";
+      curl_easy_cleanup (curl);
+      i++;
     }
 
   curl_multi_cleanup (multi_handle);

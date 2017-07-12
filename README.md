@@ -1,4 +1,6 @@
 # downloader
 
-to compile
-g++ main.cpp -lcurl -g
+build:
+make
+run:
+./downloader [list of files to download]

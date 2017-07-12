@@ -1,6 +1,9 @@
 # downloader
 
 build:
--make
+
+- make
+
 run:
--./downloader [list of files to download]
+
+- ./downloader [list of files to download]

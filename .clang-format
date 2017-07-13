@@ -1,0 +1,41 @@
+AlignEscapedNewlinesLeft: true
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+AlwaysBreakTemplateDeclarations: true
+BreakBeforeBinaryOperators: false
+BreakBeforeBraces: GNU
+BreakBeforeTernaryOperators: true
+BreakBeforeBinaryOperators: All
+
+BreakConstructorInitializersBeforeComma: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+ColumnLimit: 140
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: true
+IndentCaseLabels: false
+IndentWidth: 2
+Language: Cpp
+MaxEmptyLinesToKeep: 2
+PointerBindsToType: false
+PointerAlignment: Right
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: Always
+SpacesBeforeTrailingComments: 2
+SpacesInCStyleCastParentheses: false
+Standard: Cpp11
+UseTab: Never
+
+AlignConsecutiveAssignments: true
+AlignAfterOpenBracket: false
+BinPackArguments: true
+BinPackParameters: false
+
+PenaltyExcessCharacter: 10
+PenaltyBreakComment: 1000
+PenaltyBreakBeforeFirstCallParameter: 10000

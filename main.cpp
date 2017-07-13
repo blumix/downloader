@@ -5,25 +5,24 @@
 #include <unistd.h>
 #include <vector>
 
-size_t write_data (void *ptr, size_t size, size_t nmemb, FILE * stream)
+size_t write_data (void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
   size_t written = fwrite (ptr, size, nmemb, stream);
   return written;
 }
 
-std::string get_filename (const std::string & str)
+std::string get_filename (const std::string &str)
 {
   std::size_t found = str.find_last_of ("/\\");
   return str.substr (found + 1);
 }
 
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   std::cout << argc - 1 << " file(s) will be downloaded.\n";
 
-  std::vector < CURL * >easy_curls;
-  std::vector < FILE * >fpointers;
+  std::vector<CURL *> easy_curls;
+  std::vector<FILE *> fpointers;
 
   for (int i = 1; i < argc; i++)
     {
@@ -52,17 +51,15 @@ main (int argc, char *argv[])
   multi_handle = curl_multi_init ();
 
   /* add the individual transfers */
-  for (auto curl:easy_curls)
+  for (auto curl : easy_curls)
     curl_multi_add_handle (multi_handle, curl);
 
   int still_running;
-  //  curl_multi_perform (multi_handle, &still_running);
-
   do
     {
       struct timeval timeout;
-      int rc;			/* select() return code */
-      CURLMcode mc;		/* curl_multi_fdset() return code */
+      int rc;       /* select() return code */
+      CURLMcode mc; /* curl_multi_fdset() return code */
 
       fd_set fdread;
       fd_set fdwrite;
@@ -76,7 +73,7 @@ main (int argc, char *argv[])
       FD_ZERO (&fdexcep);
 
       /* set a suitable timeout to play around with */
-      timeout.tv_sec = 1;
+      timeout.tv_sec  = 1;
       timeout.tv_usec = 0;
 
       curl_multi_timeout (multi_handle, &curl_timeo);
@@ -90,8 +87,7 @@ main (int argc, char *argv[])
         }
 
       /* get file descriptors from the transfers */
-      mc =
-          curl_multi_fdset (multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
+      mc = curl_multi_fdset (multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd);
 
       if (mc != CURLM_OK)
         {
@@ -101,14 +97,8 @@ main (int argc, char *argv[])
 
       if (maxfd == -1)
         {
-#ifdef _WIN32
-          Sleep (100);
-          rc = 0;
-#else
-          /* Portable sleep for platforms other than Windows. */
-          struct timeval wait = { 0, 100 * 1000 };	/* 100ms */
+          struct timeval wait = {0, 100 * 1000}; /* 100ms */
           rc = select (0, NULL, NULL, NULL, &wait);
-#endif
         }
       else
         {
@@ -120,8 +110,8 @@ main (int argc, char *argv[])
         case -1:
           /* select error */
           break;
-        case 0:		/* timeout */
-        default:		/* action */
+        case 0:  /* timeout */
+        default: /* action */
           curl_multi_perform (multi_handle, &still_running);
           break;
         }
@@ -129,23 +119,20 @@ main (int argc, char *argv[])
   while (still_running);
 
   int i = 1;
-  for (auto curl:easy_curls)
+  for (auto curl : easy_curls)
     {
       curl_multi_remove_handle (multi_handle, curl);
       double filesize = 0.;
-      int res = curl_easy_getinfo (curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD,
-                                   &filesize);
+      int res         = curl_easy_getinfo (curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
       if ((CURLE_OK == res) && (filesize > 0.0))
-        std::cout << argv[i] << " Downloaded! Final size:" << filesize <<
-                     " bytes\n";
+        std::cout << argv[i] << " Downloaded! Final size:" << filesize << " bytes\n";
       curl_easy_cleanup (curl);
       i++;
     }
 
   curl_multi_cleanup (multi_handle);
 
-
-  for (auto fp:fpointers)
+  for (auto fp : fpointers)
     fclose (fp);
 
   std::cout << "Done!\n";

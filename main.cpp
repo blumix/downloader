@@ -1,4 +1,5 @@
 #include <curl/curl.h>
+#include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -27,7 +28,7 @@ int main (int argc, char *argv[])
   for (int i = 1; i < argc; i++)
     {
       //      CURLcode res;
-      const char *url = argv[i];
+      const char *url         = argv[i];
       std::string output_name = get_filename (argv[i]);
       std::cout << "Downloading " << output_name << "...\n";
 
@@ -40,6 +41,7 @@ int main (int argc, char *argv[])
           curl_easy_setopt (curl, CURLOPT_URL, url);
           curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, write_data);
           curl_easy_setopt (curl, CURLOPT_WRITEDATA, fpointers.back ());
+          curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
           //                    res = curl_easy_perform(curl);
         }
     }
@@ -98,7 +100,7 @@ int main (int argc, char *argv[])
       if (maxfd == -1)
         {
           struct timeval wait = {0, 100 * 1000}; /* 100ms */
-          rc = select (0, NULL, NULL, NULL, &wait);
+          rc                  = select (0, NULL, NULL, NULL, &wait);
         }
       else
         {
@@ -125,7 +127,9 @@ int main (int argc, char *argv[])
       double filesize = 0.;
       int res         = curl_easy_getinfo (curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
       if ((CURLE_OK == res) && (filesize > 0.0))
-        std::cout << argv[i] << " Downloaded! Final size:" << filesize << " bytes\n";
+        std::cout << argv[i] << " Downloaded! Size:" << filesize << " bytes\n";
+      else if (filesize < 0)
+        std::cout << argv[i] << " Downloaded! Size is unknown :(\n";
       curl_easy_cleanup (curl);
       i++;
     }
@@ -134,6 +138,14 @@ int main (int argc, char *argv[])
 
   for (auto fp : fpointers)
     fclose (fp);
+
+  for (int i = 1; i < argc; i++)
+    {
+      auto filename = get_filename (argv[i]);
+      std::ifstream file (filename, std::ios::binary | std::ios::ate);
+      std::cout << filename << " Result size: " << file.tellg () << " bytes\n";
+    }
+
 
   std::cout << "Done!\n";
   return 0;
